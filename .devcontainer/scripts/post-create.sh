@@ -104,7 +104,8 @@ step "Switching pipecat to editable install from workspace"
 # the build context. Re-register editable from the bind-mounted workspace
 # so source edits take effect. --no-deps skips re-resolving transitive
 # dependencies (already present from the seeded image template).
-uv pip install -e "$ROOT_DIR/pipecat" --no-deps
+python3 "$ROOT_DIR/scripts/prepare_pipecat.py"
+uv pip install -e "$ROOT_DIR/.pipecat-optimized" --no-deps
 step_done
 
 step "Installing npm dependencies (ui + ts_validator in parallel)"

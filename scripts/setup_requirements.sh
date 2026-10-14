@@ -80,7 +80,8 @@ fi
 
 # Install pipecat in editable mode with all extras
 echo "Installing pipecat dependencies..."
-pipecat_install_args=(-e './pipecat[cartesia,deepgram,openai,elevenlabs,groq,google,azure,sarvam,soundfile,silero,webrtc,speechmatics,openrouter,camb,mcp,inworld,smallest,aws-nova-sonic]')
+"$PYTHON_BIN" scripts/prepare_pipecat.py
+pipecat_install_args=(-e './.pipecat-optimized[cartesia,deepgram,openai,elevenlabs,groq,google,azure,sarvam,soundfile,silero,webrtc,speechmatics,openrouter,camb,mcp,inworld,smallest,aws-nova-sonic]')
 
 if [ "$DEV_MODE" -eq 1 ]; then
     # Resolve dev tools with runtime dependencies so grpcio-tools cannot

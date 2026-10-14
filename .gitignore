@@ -21,6 +21,7 @@ prd/
 .devcontainer/install.local.sh
 venv/
 .venv/
+.pipecat-optimized/
 .playwright-mcp
 coturn/
 *.wav

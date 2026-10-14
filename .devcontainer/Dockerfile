@@ -45,8 +45,11 @@ RUN --mount=type=bind,source=api/requirements.txt,target=/tmp/req.txt \
 # links against X11/Qt (libxcb*); without those shared libs in the image,
 # `import cv2` fails at runtime.
 RUN --mount=type=bind,source=pipecat,target=/tmp/pipecat,rw \
+    --mount=type=bind,source=patches/pipecat,target=/tmp/pipecat-patches \
+    --mount=type=bind,source=scripts/prepare_pipecat.py,target=/tmp/prepare_pipecat.py \
     --mount=type=cache,target=/root/.cache/uv \
-    uv pip install '/tmp/pipecat[cartesia,deepgram,openai,elevenlabs,groq,google,azure,sarvam,soundfile,silero,webrtc,speechmatics,openrouter,camb,mcp,inworld,smallest]' \
+    python /tmp/prepare_pipecat.py --source /tmp/pipecat --destination /tmp/pipecat-optimized --patches /tmp/pipecat-patches \
+ && uv pip install '/tmp/pipecat-optimized[cartesia,deepgram,openai,elevenlabs,groq,google,azure,sarvam,soundfile,silero,webrtc,speechmatics,openrouter,camb,mcp,inworld,smallest]' \
  && uv pip install --group /tmp/pipecat/pyproject.toml:dev \
  && uv pip uninstall opencv-python \
  && uv pip install opencv-python-headless
