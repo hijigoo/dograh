@@ -99,6 +99,13 @@ An honest comparison on the axes that matter most to teams evaluating voice AI p
 curl -o docker-compose.yaml https://raw.githubusercontent.com/dograh-hq/dograh/main/docker-compose.yaml && curl -o start_docker.sh https://raw.githubusercontent.com/dograh-hq/dograh/main/scripts/start_docker.sh && chmod +x start_docker.sh && ./start_docker.sh
 ```
 
+> [!IMPORTANT]
+> The quick start above runs published upstream images, not an image built from
+> this checkout. To use the CPU optimizations on `perf/cpu-optimization`, build
+> the API image from that branch and configure your deployment to use it.
+> Patches are applied during image build, not container startup; regression tests
+> run separately. See [CPU optimization build and validation](CPU_OPTIMIZATION.md).
+
 > **⚡ Prefer an AI agent to set it up for you?**
 > If you use **Claude Code** or **Codex**, install the official [Dograh setup skill](https://github.com/dograh-hq/dograh-plugins) and let your agent handle installation, configuration, and troubleshooting — it detects your OS, picks the right deploy path, runs Dograh's own setup scripts, and verifies the result.
 >
