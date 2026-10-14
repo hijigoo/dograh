@@ -58,6 +58,14 @@ SDK during image build. It does not run regression tests or deploy the image.
 Configure your deployment to use the built image and recreate its API container.
 Restarting an existing container does not apply a changed patch stack.
 
+CPU 최적화 브랜치의 저장소 루트에서 위 명령을 실행합니다. Pipecat 서브모듈을 초기화한 뒤
+API 이미지를 빌드합니다.
+
+Dockerfile은 이미지 빌드 중에 `patches/pipecat`의 모든 패치를 적용하고, 패치가 적용된
+SDK를 설치합니다. 회귀 테스트를 실행하거나 이미지를 배포하는 명령은 아닙니다.
+배포 설정이 빌드한 이미지를 사용하도록 지정한 뒤 API 컨테이너를 재생성해야 합니다.
+기존 컨테이너를 재시작하는 것만으로는 변경된 패치가 적용되지 않습니다.
+
 ## Validation
 
 Use the repository virtual environment and initialize the Pipecat submodule first:
@@ -70,6 +78,8 @@ python -m pytest tests/cpu_optimization -q
 ```
 
 This validates the installed, prepared SDK without a `PYTHONPATH` override.
+
+`PYTHONPATH`로 소스 경로를 덮어쓰지 않고, 패치를 적용해 실제 설치한 SDK를 검증합니다.
 
 Preparation records the pinned source commit, patch hashes and generated Python
 source hashes in `.pipecat-optimized/.dograh-patches.json`. Re-running preparation
