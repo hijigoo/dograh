@@ -22,12 +22,16 @@ from a branch containing other performance changes.
 
 | Optimization | Topic branch | SDK or runtime files changed |
 | --- | --- | --- |
-| Lazy TRACE | `perf/cpu-lazy-trace` | `processors/frame_processor.py` |
-| CPU ONNX session cache | `perf/cpu-onnx-session-cache` | `audio/vad/silero.py`, `audio/vad/cpu_session_cache.py` |
-| Exact no-op filter | `perf/cpu-noop-observer-filter` | `pipeline/worker_observer.py`, `pipeline/_observer_filter.py` |
-| VAD coalescing | `perf/cpu-vad-coalescing` | `audio/vad/vad_analyzer.py` |
-| Observer queue fast path | `perf/cpu-observer-nowait` | `pipeline/worker_observer.py` |
-| uvloop | `perf/cpu-uvloop` | `api/requirements.txt`, existing Uvicorn auto-loop entrypoints |
+| Lazy TRACE | `cpu-opt/01-lazy-trace` | `processors/frame_processor.py` |
+| CPU ONNX session cache | `cpu-opt/02-onnx-session-cache` | `audio/vad/silero.py`, `audio/vad/cpu_session_cache.py` |
+| Observer queue fast path | `cpu-opt/03-observer-nowait` | `pipeline/worker_observer.py` |
+| Exact no-op filter | `cpu-opt/04-noop-observer-filter` | `pipeline/worker_observer.py`, `pipeline/_observer_filter.py` |
+| VAD coalescing | `cpu-opt/05-vad-coalescing` | `audio/vad/vad_analyzer.py` |
+| uvloop | `cpu-opt/06-uvloop` | `api/requirements.txt`, existing Uvicorn auto-loop entrypoints |
+
+`perf/cpu-optimization` is the integration target, not an individual feature.
+The six independent review branches use `cpu-opt/NN-` to distinguish them from
+that target. Their numbering follows the source-patch installation order.
 
 SDK paths in the table are relative to `pipecat/src/pipecat`. Build order is
 explicit in patch filenames, so merging the independently committed patch files
