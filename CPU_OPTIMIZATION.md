@@ -44,6 +44,20 @@ does not introduce a submodule-pointer conflict or runtime import override.
 is enabled. Log levels, emitted text, frame delivery and callback order remain
 unchanged.
 
+## API image builds
+
+Run from the repository root on the CPU optimization branch:
+
+```bash
+git submodule update --init --recursive
+docker build -f api/Dockerfile -t dograh-api:cpu-optimized .
+```
+
+The Dockerfile applies all patches in `patches/pipecat` and installs the prepared
+SDK during image build. It does not run regression tests or deploy the image.
+Configure your deployment to use the built image and recreate its API container.
+Restarting an existing container does not apply a changed patch stack.
+
 ## Validation
 
 Use the repository virtual environment and initialize the Pipecat submodule first:
@@ -51,9 +65,11 @@ Use the repository virtual environment and initialize the Pipecat submodule firs
 ```bash
 uv pip install -r tests/cpu_optimization/requirements.txt -e pipecat
 python scripts/prepare_pipecat.py
-PYTHONPATH="$PWD/.pipecat-optimized/src:$PWD" \
-  python -m pytest tests/cpu_optimization -q
+uv pip install --no-deps -e .pipecat-optimized
+python -m pytest tests/cpu_optimization -q
 ```
+
+This validates the installed, prepared SDK without a `PYTHONPATH` override.
 
 Preparation records the pinned source commit, patch hashes and generated Python
 source hashes in `.pipecat-optimized/.dograh-patches.json`. Re-running preparation
