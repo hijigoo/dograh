@@ -33,7 +33,8 @@ jobs:
       - name: Prepare and test installed SDK sources
         run: |
           .venv/bin/python scripts/prepare_pipecat.py
-          PYTHONPATH="$PWD/.pipecat-optimized/src:$PWD" .venv/bin/python -m pytest tests/cpu_optimization -q
+          uv pip install --python .venv/bin/python --no-deps -e .pipecat-optimized
+          .venv/bin/python -m pytest tests/cpu_optimization -q
       - name: Check changed Python and shell integration
         run: |
           .venv/bin/ruff check scripts/prepare_pipecat.py tests/cpu_optimization
