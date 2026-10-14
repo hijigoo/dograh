@@ -20,6 +20,19 @@ other SDK feature PRs; each feature remains a separate patch and regression test
 The other topic branches start from the same original integration baseline, not
 from a branch containing other performance changes.
 
+| Optimization | Topic branch | SDK or runtime files changed |
+| --- | --- | --- |
+| Lazy TRACE | `perf/cpu-lazy-trace` | `processors/frame_processor.py` |
+| CPU ONNX session cache | `perf/cpu-onnx-session-cache` | `audio/vad/silero.py`, `audio/vad/cpu_session_cache.py` |
+| Exact no-op filter | `perf/cpu-noop-observer-filter` | `pipeline/worker_observer.py`, `pipeline/_observer_filter.py` |
+| VAD coalescing | `perf/cpu-vad-coalescing` | `audio/vad/vad_analyzer.py` |
+| Observer queue fast path | `perf/cpu-observer-nowait` | `pipeline/worker_observer.py` |
+| uvloop | `perf/cpu-uvloop` | `api/requirements.txt`, existing Uvicorn auto-loop entrypoints |
+
+SDK paths in the table are relative to `pipecat/src/pipecat`. Build order is
+explicit in patch filenames, so merging the independently committed patch files
+does not introduce a submodule-pointer conflict or runtime import override.
+
 ## Lazy TRACE formatting
 
 `10-lazy-trace.patch` changes the downstream and upstream push log statements in
@@ -43,6 +56,12 @@ source hashes in `.pipecat-optimized/.dograh-patches.json`. Re-running preparati
 is idempotent. A changed patch stack rebuilds only an owned, unedited generated
 copy. Keep development edits in reviewable patches; preparation refuses to
 discard edits made directly in the generated source.
+
+The focused GitHub Actions workflow targets both `main` and
+`perf/cpu-optimization`. Its hosted results are separate from local verification.
+After merging all six PRs, rerun dependency setup or rebuild the API image.
+Checking out the merged branch alone does not replace already installed packages
+or a running container.
 
 These changes port the six source optimizations measured in the earlier study.
 Benchmark-only loop/proxy proof exporters, profiler instrumentation, machine

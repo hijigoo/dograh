@@ -1,0 +1,41 @@
+name: CPU optimization regressions
+
+on:
+  pull_request:
+    branches: [main, perf/cpu-optimization]
+    paths:
+      - "patches/pipecat/**"
+      - "scripts/prepare_pipecat.py"
+      - "scripts/setup_requirements.sh"
+      - "scripts/setup_pipecat.sh"
+      - "api/requirements.txt"
+      - "api/Dockerfile"
+      - ".devcontainer/**"
+      - "tests/cpu_optimization/**"
+      - ".github/workflows/cpu-optimizations.yml"
+
+jobs:
+  targeted-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: astral-sh/setup-uv@v6
+      - name: Install focused test dependencies
+        run: |
+          uv venv .venv --python 3.13
+          uv pip install --python .venv/bin/python -r tests/cpu_optimization/requirements.txt -e pipecat
+      - name: Prepare and test installed SDK sources
+        run: |
+          .venv/bin/python scripts/prepare_pipecat.py
+          PYTHONPATH="$PWD/.pipecat-optimized/src:$PWD" .venv/bin/python -m pytest tests/cpu_optimization -q
+      - name: Check changed Python and shell integration
+        run: |
+          .venv/bin/ruff check scripts/prepare_pipecat.py tests/cpu_optimization
+          .venv/bin/ruff format --check scripts/prepare_pipecat.py tests/cpu_optimization
+          bash -n scripts/setup_requirements.sh scripts/setup_pipecat.sh .devcontainer/scripts/post-create.sh
