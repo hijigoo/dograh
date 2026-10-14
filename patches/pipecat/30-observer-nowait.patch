@@ -1,0 +1,28 @@
+diff --git a/src/pipecat/pipeline/worker_observer.py b/src/pipecat/pipeline/worker_observer.py
+index 862f79eef..cf6d524de 100644
+--- a/src/pipecat/pipeline/worker_observer.py
++++ b/src/pipecat/pipeline/worker_observer.py
+@@ -189,7 +189,10 @@ class WorkerObserver(BaseObserver):
+ 
+         for proxy in self._proxies.values():
+             if data.first_push or proxy.observer.observe_every_push:
+-                await proxy.queue.put(data)
++                if type(proxy.queue) is asyncio.Queue and proxy.queue.maxsize == 0:
++                    proxy.queue.put_nowait(data)
++                else:
++                    await proxy.queue.put(data)
+ 
+     async def on_processor_setup(self, data: ProcessorSetUp):
+         """Queue processor setup timing for all managed observers.
+@@ -234,7 +237,10 @@ class WorkerObserver(BaseObserver):
+         if not self._proxies:
+             return
+         for proxy in self._proxies.values():
+-            await proxy.queue.put(data)
++            if type(proxy.queue) is asyncio.Queue and proxy.queue.maxsize == 0:
++                proxy.queue.put_nowait(data)
++            else:
++                await proxy.queue.put(data)
+ 
+     async def _proxy_task_handler(self, queue: asyncio.Queue, observer: BaseObserver):
+         """Handle frame processing for a single observer."""
