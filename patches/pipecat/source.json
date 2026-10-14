@@ -1,0 +1,9 @@
+{
+  "commit": "41a5b9e691d5a5c74d0706077afe8678765f38a5",
+  "sha256": {
+    "src/pipecat/processors/frame_processor.py": "ac4884bc84ff7e9b78a1cb3e640be70b4d6380db808240d5ee8096f55952f9b5",
+    "src/pipecat/audio/vad/silero.py": "9eec0ae79d63341e010fd1351031f2ea73a76204bc9ade57d3107ba5d31740a3",
+    "src/pipecat/pipeline/worker_observer.py": "238ce2165d3d92afe792733c2d3a7feef872dc8abe442e5fe7df2ba635604717",
+    "src/pipecat/audio/vad/vad_analyzer.py": "e9aa3a1d84228fafba867ae3a14478a3f45d39653952586808b650955b7385e8"
+  }
+}

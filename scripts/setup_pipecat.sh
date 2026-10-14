@@ -20,6 +20,7 @@ pip install -r api/requirements.txt
 
 # Install pipecat from submodule last so it overrides any pipecat-ai pulled in by dependencies
 echo "Installing pipecat dependencies..."
-pip install -e ./pipecat[cartesia,deepgram,openai,elevenlabs,groq,google,azure,sarvam,soundfile,silero,webrtc,speechmatics,openrouter,camb,mcp,inworld,smallest,aws-nova-sonic]
+python3 scripts/prepare_pipecat.py
+pip install -e './.pipecat-optimized[cartesia,deepgram,openai,elevenlabs,groq,google,azure,sarvam,soundfile,silero,webrtc,speechmatics,openrouter,camb,mcp,inworld,smallest,aws-nova-sonic]'
 
 echo "Setup complete! Pipecat is now available as a git submodule."
