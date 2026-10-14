@@ -1,0 +1,39 @@
+diff --git a/src/pipecat/pipeline/worker_observer.py b/src/pipecat/pipeline/worker_observer.py
+--- a/src/pipecat/pipeline/worker_observer.py
++++ b/src/pipecat/pipeline/worker_observer.py
+@@ -27,3 +27,4 @@
+     StartupWarmup,
+ )
++from pipecat.pipeline._observer_filter import is_noop_process
+ from pipecat.utils.asyncio.task_manager import BaseTaskManager
+@@ -233,4 +234,6 @@
+     async def _send_to_proxy(self, data: Any):
+         if not self._proxies:
+             return
+         for proxy in self._proxies.values():
++            if isinstance(data, FrameProcessed) and is_noop_process(proxy.observer):
++                continue
+diff --git a/src/pipecat/pipeline/_observer_filter.py b/src/pipecat/pipeline/_observer_filter.py
+new file mode 100644
+index 000000000..d6c076645
+--- /dev/null
++++ b/src/pipecat/pipeline/_observer_filter.py
+@@ -0,0 +1,18 @@
++"""Exclude only the exact inherited no-op process callback from proxy fanout."""
++
++from types import CodeType, MethodType
++
++from pipecat.observers.base_observer import BaseObserver
++
++_DEFAULT_PROCESS = BaseObserver.on_process_frame
++_DEFAULT_PROCESS_CODE: CodeType = BaseObserver.on_process_frame.__code__
++
++
++def is_noop_process(observer: BaseObserver) -> bool:
++    """Conservatively retain overrides, instance patches and modified function code."""
++    callback = observer.on_process_frame
++    return (
++        isinstance(callback, MethodType)
++        and callback.__func__ is _DEFAULT_PROCESS
++        and callback.__func__.__code__ is _DEFAULT_PROCESS_CODE
++    )
