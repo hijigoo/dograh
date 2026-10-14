@@ -1,0 +1,61 @@
+diff --git a/src/pipecat/audio/vad/silero.py b/src/pipecat/audio/vad/silero.py
+index f3a884ebb..664eddccb 100644
+--- a/src/pipecat/audio/vad/silero.py
++++ b/src/pipecat/audio/vad/silero.py
+@@ -24,6 +24,7 @@ _MODEL_RESET_STATES_TIME = 5.0
+ 
+ try:
+     import onnxruntime
++    from pipecat.audio.vad.cpu_session_cache import get_cpu_session
+ 
+ except ModuleNotFoundError as e:
+     logger.error(f"Exception: {e}")
+@@ -51,9 +52,7 @@ class SileroOnnxModel:
+         opts.intra_op_num_threads = 1
+ 
+         if force_onnx_cpu and "CPUExecutionProvider" in onnxruntime.get_available_providers():
+-            self.session = onnxruntime.InferenceSession(
+-                path, providers=["CPUExecutionProvider"], sess_options=opts
+-            )
++            self.session = get_cpu_session(path)
+         else:
+             self.session = onnxruntime.InferenceSession(path, sess_options=opts)
+ 
+diff --git a/src/pipecat/audio/vad/cpu_session_cache.py b/src/pipecat/audio/vad/cpu_session_cache.py
+new file mode 100644
+index 000000000..dfd48b47f
+--- /dev/null
++++ b/src/pipecat/audio/vad/cpu_session_cache.py
+@@ -0,0 +1,32 @@
++"""Reuse immutable CPU ONNX sessions, never a caller's recurrent model state."""
++
++from collections import OrderedDict
++from pathlib import Path
++from threading import Lock
++from typing import ClassVar
++
++import onnxruntime
++
++
++class _Sessions:
++    lock: ClassVar[Lock] = Lock()
++    entries: ClassVar[OrderedDict[str | bytes, onnxruntime.InferenceSession]] = OrderedDict()
++
++
++def get_cpu_session(model_path: str | bytes | Path) -> onnxruntime.InferenceSession:
++    """Cache up to four immutable model sessions within this API process."""
++    key = model_path if isinstance(model_path, bytes) else str(Path(model_path).resolve())
++    with _Sessions.lock:
++        if key in _Sessions.entries:
++            _Sessions.entries.move_to_end(key)
++            return _Sessions.entries[key]
++        options = onnxruntime.SessionOptions()
++        options.inter_op_num_threads = 1
++        options.intra_op_num_threads = 1
++        session = onnxruntime.InferenceSession(
++            model_path, providers=["CPUExecutionProvider"], sess_options=options
++        )
++        _Sessions.entries[key] = session
++        if len(_Sessions.entries) > 4:
++            _Sessions.entries.popitem(last=False)
++        return session
