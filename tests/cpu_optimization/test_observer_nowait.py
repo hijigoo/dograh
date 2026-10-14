@@ -73,6 +73,32 @@ def test_given_queue_subclass_when_fanning_out_then_custom_put_is_retained():
     asyncio.run(exercise())
 
 
+def test_given_exact_unbounded_queue_when_sending_then_put_coroutine_is_not_called(
+    monkeypatch,
+):
+    async def exercise():
+        worker, observer, queue = WorkerObserver(), BaseObserver(), asyncio.Queue()
+        task = await proxy(worker, observer, queue)
+
+        async def forbidden_put(item):
+            raise AssertionError(
+                "Unbounded enqueue allocated an unnecessary put coroutine"
+            )
+
+        monkeypatch.setattr(queue, "put", forbidden_put)
+        processor = FrameProcessor()
+        event = FramePushed(processor, processor, Frame(), FrameDirection.DOWNSTREAM, 0)
+        try:
+            await worker.on_pipeline_started()
+            await worker.on_push_frame(event)
+            await asyncio.wait_for(queue.join(), 2)
+            assert queue.empty()
+        finally:
+            await stop(task)
+
+    asyncio.run(exercise())
+
+
 def test_given_full_bounded_queue_when_sending_then_backpressure_and_cancellation_are_preserved():
     async def exercise():
         worker, observer, queue = (
