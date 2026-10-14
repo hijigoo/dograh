@@ -105,6 +105,12 @@ curl -o docker-compose.yaml https://raw.githubusercontent.com/dograh-hq/dograh/m
 > the API image from that branch and configure your deployment to use it.
 > Patches are applied during image build, not container startup; regression tests
 > run separately. See [CPU optimization build and validation](CPU_OPTIMIZATION.md).
+>
+> 위 빠른 시작은 이 저장소의 소스를 빌드하는 대신 미리 배포된 upstream 이미지를 실행합니다.
+> `perf/cpu-optimization` 브랜치의 CPU 최적화를 사용하려면 해당 브랜치에서 API 이미지를
+> 빌드하고, 배포 설정이 그 이미지를 사용하도록 지정해야 합니다.
+> 패치는 컨테이너 시작 시점이 아닌 이미지 빌드 중에 적용되며, 회귀 테스트는 별도로
+> 실행합니다. 자세한 내용은 [CPU 최적화 빌드 및 검증](CPU_OPTIMIZATION.md)을 참고하세요.
 
 > **⚡ Prefer an AI agent to set it up for you?**
 > If you use **Claude Code** or **Codex**, install the official [Dograh setup skill](https://github.com/dograh-hq/dograh-plugins) and let your agent handle installation, configuration, and troubleshooting — it detects your OS, picks the right deploy path, runs Dograh's own setup scripts, and verifies the result.
